@@ -1,7 +1,7 @@
 import * as AWS from 'aws-sdk';
 import * as AWSXRay from 'aws-xray-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
-import { ProductItem } from '../models';
+import { PaginationInfo } from '../types';
 
 const XAWS = AWSXRay.captureAWS(AWS);
 
@@ -11,13 +11,14 @@ export class ProductAccess {
         private readonly productsTable =  process.env.PRODUCTS_TABLE
     ){}
 
-    async getAllProductItems(): Promise<ProductItem[]> {
+    async getAllProductItems(paginationInfo: PaginationInfo): Promise<any> {
         const result = await this.docClient.scan({
-            TableName: this.productsTable
+            TableName: this.productsTable,
+            Limit: paginationInfo.limit,
+            ExclusiveStartKey: paginationInfo.nextKey
         }).promise();
 
-        const items = result.Items;
-        return items as ProductItem[];
+        return result;
     }
 }
 

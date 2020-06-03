@@ -1,8 +1,8 @@
 import { ProductAccess } from '../dataLayer/productsAccess';
-import { ProductItem } from '../models';
+import { PaginationInfo } from '../types';
 
 const productAccess = new ProductAccess();
 
-export async function getAllProductItems(): Promise<ProductItem[]> {
-    return productAccess.getAllProductItems();
+export async function getAllProductItems(paginationInfo: PaginationInfo): Promise<any> {
+    return productAccess.getAllProductItems(paginationInfo);
 }

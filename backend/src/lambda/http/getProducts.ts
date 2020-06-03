@@ -2,15 +2,28 @@ import 'source-map-support/register';
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda';
 import { getAllProductItems  } from '../../businessLogic/products';
 import { createLogger } from '../../utils/logger';
+import { parseLimitParameter, parseNextKeyParameter, encodeNextKey } from '../../utils/pagination';
+import { PaginationInfo } from '../../types';
 
 const logger = createLogger('get-all-products');
 
 export const handler: APIGatewayProxyHandler = async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    logger.info('Processing event for getting all products');
+    logger.info('Processing event for getting all products: ', event);
+
+    let nextKey;
+    let limit;
 
     try {
-        const products = await getAllProductItems();
-        logger.info('Available products: ', products);
+        nextKey = parseNextKeyParameter(event);
+        limit = parseLimitParameter(event);
+       
+        logger.info('Query limit: ', limit);
+        logger.info('Query nextKey:  ', nextKey);
+
+        const paginationInfo: PaginationInfo = {limit, nextKey};
+
+        const queryResult = await getAllProductItems(paginationInfo);
+        logger.info('Available products: ', queryResult.Items);
 
         return {
             statusCode: 200,
@@ -18,7 +31,8 @@ export const handler: APIGatewayProxyHandler = async(event: APIGatewayProxyEvent
               'Access-Control-Allow-Origin': '*'
             },
             body: JSON.stringify({
-                products
+                products: queryResult.Items,
+                nextKey: encodeNextKey(queryResult.LastEvaluatedKey)
             })
           };
 
