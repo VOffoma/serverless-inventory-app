@@ -20,6 +20,19 @@ export class ProductAccess {
 
         return result;
     }
+
+    async bulkAddProductItems(productItems): Promise<void>{
+        try {
+            await this.docClient.batchWrite({
+                RequestItems: {
+                    [this.productsTable]: productItems
+                }
+            }).promise();
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 function createDynamoDBClient() {

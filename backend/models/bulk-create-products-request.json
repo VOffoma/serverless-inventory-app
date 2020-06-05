@@ -1,0 +1,25 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "title": "productList",
+    "type": "array",
+    "maxItems": 100,
+    "minItems": 2,
+    "items": {
+        "type": "object",
+        "properties": {
+            "productName": {
+              "type": "string"
+            },
+            "mass_g": {
+              "type": "number"
+            },
+            "quantity": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "productName", "mass_g"
+          ],
+          "additionalProperties": false
+    }
+}
