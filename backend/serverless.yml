@@ -18,6 +18,9 @@ custom:
       - name: BulkProductsRequest
         contentType: application/json
         schema: ${file(models/bulk-create-products-request.json)}
+      - name: ProductRequest
+        contentType: application/json
+        schema: ${file(models/create-product-request.json)}
 
 # Add the serverless-webpack plugin
 plugins:
@@ -50,6 +53,25 @@ functions:
       - Effect: Allow
         Action: 
           - dynamodb:Scan
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}
+
+  CreateProduct:
+    handler: src/lambda/http/createProduct.handler
+    events:
+      - http:
+          method: post
+          path: products
+          cors: true
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Create a new productItem
+            description: Create a new productItem
+            requestModels:
+              'application/json': ProductRequest
+    iamRoleStatements:
+      - Effect: Allow
+        Action: 
+          - dynamodb:PutItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}
 
   BulkCreateProducts:

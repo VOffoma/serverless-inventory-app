@@ -1,12 +1,23 @@
 import * as uuid from 'uuid';
 import { ProductAccess } from '../dataLayer/productsAccess';
 import { ProductItem } from '../models';
-import { PaginationInfo } from '../types';
+import { PaginationInfo, CreateProductRequest } from '../types';
 
 const productAccess = new ProductAccess();
 
 export async function getAllProductItems(paginationInfo: PaginationInfo): Promise<any> {
     return productAccess.getAllProductItems(paginationInfo);
+}
+
+export async function createProductItem(createProductRequest: CreateProductRequest)
+: Promise<ProductItem> {
+    return await productAccess.createProductItem({
+        productId: uuid.v4(),
+        quantity: createProductRequest.quantity || 0,
+        addedAt: new Date().toISOString(),
+        productName: createProductRequest.productName,
+        mass_g: createProductRequest.mass_g,
+    });
 }
 
 export async function bulkAddProductItems(productItems): Promise<void> {

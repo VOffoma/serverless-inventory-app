@@ -2,6 +2,7 @@ import * as AWS from 'aws-sdk';
 import * as AWSXRay from 'aws-xray-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { PaginationInfo } from '../types';
+import { ProductItem } from '../models';
 
 const XAWS = AWSXRay.captureAWS(AWS);
 
@@ -19,6 +20,15 @@ export class ProductAccess {
         }).promise();
 
         return result;
+    }
+
+    async createProductItem(productItem: ProductItem): Promise<ProductItem> {
+        await this.docClient.put({
+            TableName: this.productsTable,
+            Item: productItem
+        }).promise();
+
+        return productItem;
     }
 
     async bulkAddProductItems(productItems): Promise<void>{
