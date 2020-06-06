@@ -6,3 +6,8 @@ export interface ProductItem {
     addedAt: string
     attachmentUrl?: string
   }
+
+  export interface ProductUpdate {
+    mass_g: number
+    quantity: number
+  }

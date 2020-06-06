@@ -1,8 +1,8 @@
 import * as AWS from 'aws-sdk';
 import * as AWSXRay from 'aws-xray-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
-import { PaginationInfo } from '../types';
-import { ProductItem } from '../models';
+import { PaginationInfo, Key } from '../types';
+import { ProductItem, ProductUpdate } from '../models';
 
 const XAWS = AWSXRay.captureAWS(AWS);
 
@@ -22,6 +22,17 @@ export class ProductAccess {
         return result;
     }
 
+    async getSingleProductItem(tableKey: Key): Promise<ProductItem>{
+        const result = await this.docClient.get({
+          TableName: this.productsTable,
+          Key: {
+            productId: tableKey.productId
+          }
+        })
+        .promise();
+        return result.Item as ProductItem;
+    } 
+
     async createProductItem(productItem: ProductItem): Promise<ProductItem> {
         await this.docClient.put({
             TableName: this.productsTable,
@@ -29,6 +40,31 @@ export class ProductAccess {
         }).promise();
 
         return productItem;
+    }
+
+    async updateProductItem(productUpdate: ProductUpdate, tableKey: Key): Promise<void> {
+        await this.docClient.update({
+            TableName: this.productsTable,
+            Key: {
+                productId: tableKey.productId
+            },
+            UpdateExpression: "set quantity=:q, mass_g=:mg",
+            ExpressionAttributeValues: {
+                ":q": productUpdate.quantity,
+                ":mg": productUpdate.mass_g
+            }
+        }).promise();
+
+    }
+
+    async deleteProductItem(tableKey: Key): Promise<void> {
+        await this.docClient.delete({
+            TableName: this.productsTable,
+            Key: {
+                productId: tableKey.productId
+            },
+        }).promise();
+
     }
 
     async bulkAddProductItems(productItems): Promise<void>{

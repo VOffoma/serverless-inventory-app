@@ -1,12 +1,16 @@
 import * as uuid from 'uuid';
 import { ProductAccess } from '../dataLayer/productsAccess';
 import { ProductItem } from '../models';
-import { PaginationInfo, CreateProductRequest } from '../types';
+import { PaginationInfo, CreateProductRequest, Key, UpdateProductRequest } from '../types';
 
 const productAccess = new ProductAccess();
 
 export async function getAllProductItems(paginationInfo: PaginationInfo): Promise<any> {
     return productAccess.getAllProductItems(paginationInfo);
+}
+
+export async function getSingleProductItem(tableKey: Key): Promise<ProductItem> {
+    return productAccess.getSingleProductItem(tableKey);
 }
 
 export async function createProductItem(createProductRequest: CreateProductRequest)
@@ -18,6 +22,14 @@ export async function createProductItem(createProductRequest: CreateProductReque
         productName: createProductRequest.productName,
         mass_g: createProductRequest.mass_g,
     });
+}
+
+export async function updateProductItem(updateProductRequest: UpdateProductRequest, tableKey: Key): Promise<void> {
+    await productAccess.updateProductItem({...updateProductRequest}, tableKey);
+}
+
+export async function deleteProductItem(tableKey: Key): Promise<void> {
+    await productAccess.deleteProductItem(tableKey);
 }
 
 export async function bulkAddProductItems(productItems): Promise<void> {

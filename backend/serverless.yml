@@ -93,6 +93,37 @@ functions:
           - dynamodb:BatchWriteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}
 
+  UpdateProduct:
+    handler: src/lambda/http/updateProduct.handler
+    events:
+      - http:
+          method: patch
+          path: products/{productId}
+          cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}
+
+      
+      
+        #TODO: Configure this function
+  DeleteProduct:
+    handler: src/lambda/http/deleteProduct.handler
+    events:
+      - http:
+          method: delete
+          path: products/{productId}
+          cors: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}
+
 resources:
   Resources:
 
