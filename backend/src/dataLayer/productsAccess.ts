@@ -5,10 +5,13 @@ import { PaginationInfo, Key } from '../types';
 import { ProductItem, ProductUpdate } from '../models';
 
 const XAWS = AWSXRay.captureAWS(AWS);
+const bucketName = process.env.IMAGES_S3_BUCKET;
+const urlExpiration = process.env.SIGNED_URL_EXPIRATION;
 
 export class ProductAccess {
     constructor(
         private readonly docClient: DocumentClient = createDynamoDBClient(),
+        private readonly s3Client = createS3Client(),
         private readonly productsTable =  process.env.PRODUCTS_TABLE
     ){}
 
@@ -79,8 +82,22 @@ export class ProductAccess {
             throw error;
         }
     }
+
+    getUploadUrl(productId: string): string {
+        return this.s3Client.getSignedUrl('putObject', {
+            Bucket: bucketName,
+            Key: productId,
+            Expires: urlExpiration
+        });
+    }
 }
 
 function createDynamoDBClient() {
     return new XAWS.DynamoDB.DocumentClient();
+}
+
+function createS3Client() {
+    return new XAWS.S3({
+        signatureVersion: 'v4'
+      })
 }

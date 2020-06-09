@@ -4,6 +4,7 @@ import { ProductItem } from '../models';
 import { PaginationInfo, CreateProductRequest, Key, UpdateProductRequest } from '../types';
 
 const productAccess = new ProductAccess();
+const bucketName = process.env.IMAGES_S3_BUCKET;
 
 export async function getAllProductItems(paginationInfo: PaginationInfo): Promise<any> {
     return productAccess.getAllProductItems(paginationInfo);
@@ -15,12 +16,14 @@ export async function getSingleProductItem(tableKey: Key): Promise<ProductItem> 
 
 export async function createProductItem(createProductRequest: CreateProductRequest)
 : Promise<ProductItem> {
+    const itemId = uuid.v4();
     return await productAccess.createProductItem({
-        productId: uuid.v4(),
+        productId: itemId,
         quantity: createProductRequest.quantity || 0,
         addedAt: new Date().toISOString(),
         productName: createProductRequest.productName,
         mass_g: createProductRequest.mass_g,
+        attachmentUrl: `https://${bucketName}.s3.amazonaws.com/${itemId}`
     });
 }
 
@@ -30,6 +33,10 @@ export async function updateProductItem(updateProductRequest: UpdateProductReque
 
 export async function deleteProductItem(tableKey: Key): Promise<void> {
     await productAccess.deleteProductItem(tableKey);
+}
+
+export function getUploadUrl(todoId: string): string {
+    return  productAccess.getUploadUrl(todoId);
 }
 
 export async function bulkAddProductItems(productItems): Promise<void> {
@@ -56,8 +63,10 @@ function createPutItemRequestsForProduct(productItems): [] {
 }
 
 function populateProductItemFields (item: ProductItem) {
-    item.productId = uuid.v4();
+    const itemId = uuid.v4();
+    item.productId = itemId;
     item.quantity = item.quantity || 0;
     item.addedAt = new Date().toISOString();
+    item.attachmentUrl =  `https://${bucketName}.s3.amazonaws.com/${itemId}`;
     return item;
 }
