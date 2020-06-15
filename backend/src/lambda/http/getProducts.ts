@@ -4,6 +4,7 @@ import { getAllProductItems  } from '../../businessLogic/products';
 import { createLogger } from '../../utils/logger';
 import { parseLimitParameter, parseNextKeyParameter, encodeNextKey } from '../../utils/pagination';
 import { PaginationInfo } from '../../types';
+import { getUserId } from '../../utils/event';
 
 const logger = createLogger('get-all-products');
 
@@ -14,6 +15,9 @@ export const handler: APIGatewayProxyHandler = async(event: APIGatewayProxyEvent
     let limit;
 
     try {
+        const userId = getUserId(event);
+        logger.info('userId:  ', userId);
+        
         nextKey = parseNextKeyParameter(event);
         limit = parseLimitParameter(event);
        
@@ -22,7 +26,7 @@ export const handler: APIGatewayProxyHandler = async(event: APIGatewayProxyEvent
 
         const paginationInfo: PaginationInfo = {limit, nextKey};
 
-        const queryResult = await getAllProductItems(paginationInfo);
+        const queryResult = await getAllProductItems(userId, paginationInfo);
         logger.info('Available products: ', queryResult.Items);
 
         return {

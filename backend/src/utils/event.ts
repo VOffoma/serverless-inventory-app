@@ -1,4 +1,5 @@
 import { APIGatewayProxyEvent } from "aws-lambda";
+import { parseUserId } from "../auth/utils";
 
 /**
  * Get a query parameter or return "undefined"
@@ -15,4 +16,12 @@ export function getQueryParameter(event: APIGatewayProxyEvent, name: string) : s
     }
   
     return queryParams[name];
+  }
+
+  export function getUserId(event: APIGatewayProxyEvent): string {
+    const authorization = event.headers.Authorization;
+    const split = authorization.split(' ');
+    const jwtToken = split[1];
+  
+    return parseUserId(jwtToken);
   }

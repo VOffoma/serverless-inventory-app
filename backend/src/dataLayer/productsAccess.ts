@@ -7,6 +7,7 @@ import { ProductItem, ProductUpdate } from '../models';
 const XAWS = AWSXRay.captureAWS(AWS);
 const bucketName = process.env.IMAGES_S3_BUCKET;
 const urlExpiration = process.env.SIGNED_URL_EXPIRATION;
+const productNameIndex = process.env.PRODUCT_NAME_INDEX;
 
 export class ProductAccess {
     constructor(
@@ -15,13 +16,20 @@ export class ProductAccess {
         private readonly productsTable =  process.env.PRODUCTS_TABLE
     ){}
 
-    async getAllProductItems(paginationInfo: PaginationInfo): Promise<any> {
-        const result = await this.docClient.scan({
+    async getAllProductItems(userId: string, paginationInfo: PaginationInfo): Promise<any> {
+
+        const result = await this.docClient.query({
             TableName: this.productsTable,
+            IndexName: productNameIndex,
+            KeyConditionExpression: 'userId = :userId',
+            ExpressionAttributeValues: {
+                ':userId':userId
+            },
             Limit: paginationInfo.limit,
             ExclusiveStartKey: paginationInfo.nextKey
         }).promise();
 
+    
         return result;
     }
 
@@ -29,6 +37,7 @@ export class ProductAccess {
         const result = await this.docClient.get({
           TableName: this.productsTable,
           Key: {
+            userId: tableKey.userId,
             productId: tableKey.productId
           }
         })
@@ -49,6 +58,7 @@ export class ProductAccess {
         await this.docClient.update({
             TableName: this.productsTable,
             Key: {
+                userId: tableKey.userId,
                 productId: tableKey.productId
             },
             UpdateExpression: "set quantity=:q, mass_g=:mg",
@@ -64,6 +74,7 @@ export class ProductAccess {
         await this.docClient.delete({
             TableName: this.productsTable,
             Key: {
+                userId: tableKey.userId,
                 productId: tableKey.productId
             },
         }).promise();

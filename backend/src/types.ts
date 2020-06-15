@@ -1,9 +1,10 @@
 export interface PaginationInfo {
-   limit: number,
+   limit: number
    nextKey: object
 }
 
 export interface Key {
+   userId: string
    productId: string
  }
 

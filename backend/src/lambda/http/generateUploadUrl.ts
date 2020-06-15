@@ -5,6 +5,7 @@ import cors from '@middy/http-cors';
 import { getUploadUrl, getSingleProductItem } from '../../businessLogic/products';
 import { createLogger } from '../../utils/logger';
 import { Key } from '../../types';
+import { getUserId } from '../../utils/event';
 
 const logger = createLogger('generate-upload-url');
 
@@ -15,7 +16,8 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
   // TODO: Return a presigned URL to upload a file for a Product item with the provided id
   try {
   
-    const tableKey: Key = {productId};
+    const userId = getUserId(event);
+    const tableKey: Key = {userId, productId};
     const productItem = await getSingleProductItem(tableKey);
   
     if(!productItem) {

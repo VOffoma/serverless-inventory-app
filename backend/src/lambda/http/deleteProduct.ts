@@ -4,6 +4,7 @@ import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import { createLogger } from '../../utils/logger';
 import { deleteProductItem, getSingleProductItem } from '../../businessLogic/products';
+import { getUserId } from '../../utils/event';
 import { Key } from '../../types';
 
 
@@ -16,8 +17,8 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
   // TODO: Remove a Product item by id
 
   try {
-  
-    const tableKey: Key = {productId};
+    const userId = getUserId(event);
+    const tableKey: Key = {userId, productId};
     const productItemToDelete = await getSingleProductItem(tableKey);
 
     if(!productItemToDelete) {

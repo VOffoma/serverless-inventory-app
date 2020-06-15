@@ -5,6 +5,7 @@ import cors from '@middy/http-cors';
 import { createLogger } from '../../utils/logger';
 import { updateProductItem, getSingleProductItem } from '../../businessLogic/products';
 import { Key, UpdateProductRequest} from '../../types';
+import { getUserId } from '../../utils/event';
 
 
 const logger = createLogger('update-product');
@@ -20,7 +21,10 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
   // TODO: Update a Product item with the provided id using values in the "productUpdate" object
     try {
     
-        const tableKey: Key = {productId};
+        const userId = getUserId(event);
+        logger.info(`userId: ${userId}`);
+
+        const tableKey: Key = {userId, productId};
         const productItemToUpdate = await getSingleProductItem(tableKey);
 
         if(!productItemToUpdate) {
@@ -29,7 +33,7 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
 
         await updateProductItem(productUpdate, tableKey);
 
-        logger.info('todoitem has been updated');
+        logger.info('productitem has been updated');
 
         return {
           statusCode: 200,

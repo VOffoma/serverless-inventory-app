@@ -1,5 +1,6 @@
 export interface ProductItem {
     productId: string
+    userId: string
     productName: string
     mass_g: number
     quantity: number

@@ -4,6 +4,7 @@ import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import { createLogger } from '../../utils/logger';
 import { bulkAddProductItems  } from '../../businessLogic/products';
+import { getUserId } from '../../utils/event';
 
 
 const logger = createLogger('bulk-create-products');
@@ -12,9 +13,10 @@ export const handler = middy(async(event: APIGatewayProxyEvent): Promise<APIGate
     logger.info('Processing event for the bulk creation of products: ', event);
 
     const productItems = JSON.parse(event.body);
+    const userId = getUserId(event);
 
     try {
-        await bulkAddProductItems(productItems);
+        await bulkAddProductItems(userId, productItems);
         return {
             statusCode: 200,
             body: JSON.stringify({})
