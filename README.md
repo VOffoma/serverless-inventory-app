@@ -8,7 +8,7 @@ This application will allow for the following actions:
 * Update a product 
 * Delete a product 
 
-# TODO items
+# Product items
 
 The application should store product items and each product item has an attachment image. Each product item contains the following fields:
 
