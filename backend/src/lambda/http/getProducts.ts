@@ -1,5 +1,7 @@
 import 'source-map-support/register';
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda';
+import middy from '@middy/core';
+import cors from '@middy/http-cors';
 import { getAllProductItems  } from '../../businessLogic/products';
 import { createLogger } from '../../utils/logger';
 import { parseLimitParameter, parseNextKeyParameter, encodeNextKey } from '../../utils/pagination';
@@ -8,7 +10,7 @@ import { getUserId } from '../../utils/event';
 
 const logger = createLogger('get-all-products');
 
-export const handler: APIGatewayProxyHandler = async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const handler = middy(async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     logger.info('Processing event for getting all products: ', event);
 
     let nextKey;
@@ -31,9 +33,6 @@ export const handler: APIGatewayProxyHandler = async(event: APIGatewayProxyEvent
 
         return {
             statusCode: 200,
-            headers: {
-              'Access-Control-Allow-Origin': '*'
-            },
             body: JSON.stringify({
                 products: queryResult.Items,
                 nextKey: encodeNextKey(queryResult.LastEvaluatedKey)
@@ -49,5 +48,9 @@ export const handler: APIGatewayProxyHandler = async(event: APIGatewayProxyEvent
             })
         }
     }
-}
+});
 
+handler
+.use(cors({
+    credentials: true
+}));

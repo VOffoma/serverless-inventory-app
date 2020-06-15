@@ -1,12 +1,15 @@
-import 'source-map-support/register';
-import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda';
-import { createLogger } from '../../utils/logger';
 import Axios from 'axios';
+import 'source-map-support/register';
+import middy from '@middy/core';
+import cors from '@middy/http-cors';
+import { APIGatewayProxyResult} from 'aws-lambda';
+import { createLogger } from '../../utils/logger';
+
 
 
 const logger = createLogger('get-token');
 
-export const handler: APIGatewayProxyHandler = async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const handler = middy(async(): Promise<APIGatewayProxyResult> => {
     logger.info('Trying to get token');
 
     try {
@@ -27,9 +30,6 @@ export const handler: APIGatewayProxyHandler = async(event: APIGatewayProxyEvent
 
         return {
             statusCode: 200,
-            headers: {
-              'Access-Control-Allow-Origin': '*'
-            },
             body: JSON.stringify({
                 token: response.data
             })
@@ -44,5 +44,10 @@ export const handler: APIGatewayProxyHandler = async(event: APIGatewayProxyEvent
             })
         }
     }
-}
+});
+
+handler
+.use(cors({
+    credentials: true
+}));
 
