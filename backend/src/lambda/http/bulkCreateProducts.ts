@@ -13,13 +13,16 @@ export const handler = middy(async(event: APIGatewayProxyEvent): Promise<APIGate
     logger.info('Processing event for the bulk creation of products');
 
     const productItems = JSON.parse(event.body);
+    const productCount = productItems.length;
     const userId = getUserId(event);
 
     try {
         await bulkAddProductItems(userId, productItems);
         return {
             statusCode: 200,
-            body: JSON.stringify({})
+            body: JSON.stringify({
+                message: `${productCount} has been created`
+            })
           };
 
     } catch (error) {

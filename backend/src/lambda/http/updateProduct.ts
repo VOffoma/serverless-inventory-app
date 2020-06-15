@@ -37,7 +37,9 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
 
         return {
           statusCode: 200,
-          body: JSON.stringify({})
+          body: JSON.stringify({
+            message: `Product with Id ${productId} has been updated successfully`
+          })
         }
     } catch (error) {
         logger.info(error.message);
