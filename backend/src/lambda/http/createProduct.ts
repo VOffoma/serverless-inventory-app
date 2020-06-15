@@ -13,12 +13,12 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
 
   const newProduct: CreateProductRequest = JSON.parse(event.body)
 
-  logger.info('Processing event for create productitem with the following detail: ', newProduct);
+  logger.info(`Processing event for create productitem with the following detail: ${newProduct}`);
  
   const userId = getUserId(event);
   const item = await createProductItem(newProduct, userId);
 
-  logger.info('detail for new productitem: ', item);
+  logger.info(`detail for new productitem: ${item}`);
 
   return {
     statusCode: 201,

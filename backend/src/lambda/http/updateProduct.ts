@@ -15,8 +15,8 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
   const productId = event.pathParameters.productId;
   const productUpdate: UpdateProductRequest = JSON.parse(event.body);
 
-  logger.info('Processing event to update product with id: ', productId);
-  logger.info('update content:  ', productUpdate);
+  logger.info(`Processing event to update product with id: ${productId}`);
+  logger.info(`update content: ${productUpdate}`);
 
   // TODO: Update a Product item with the provided id using values in the "productUpdate" object
     try {

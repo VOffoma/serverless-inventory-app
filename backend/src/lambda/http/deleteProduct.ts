@@ -13,7 +13,7 @@ const logger = createLogger('delete-product');
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const productId = event.pathParameters.productId;
 
-  logger.info('Processing event to delete product with id: ', productId);
+  logger.info('Processing event to delete product with id: ${productId}');
   // TODO: Remove a Product item by id
 
   try {
@@ -27,7 +27,7 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
     
     await deleteProductItem(tableKey);
 
-    logger.info('product has been deleted. ProductItem: ', productId);
+    logger.info(`product has been deleted.`);
 
     return {
       statusCode: 200,

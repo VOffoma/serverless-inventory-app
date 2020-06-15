@@ -11,7 +11,7 @@ const logger = createLogger('generate-upload-url');
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const productId = event.pathParameters.productId;
-  logger.info('Processing event to create upload url for product with id: ', productId);
+  logger.info(`Processing event to create upload url for product with id: ${productId}`);
   
   // TODO: Return a presigned URL to upload a file for a Product item with the provided id
   try {
@@ -26,7 +26,7 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
   
   
     const url = getUploadUrl(productId);
-    logger.info('upload url: ', url);
+    logger.info(`upload url: ${url}`);
 
     return {
       statusCode: 200,

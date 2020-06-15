@@ -10,7 +10,7 @@ import { getUserId } from '../../utils/event';
 const logger = createLogger('bulk-create-products');
 
 export const handler = middy(async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    logger.info('Processing event for the bulk creation of products: ', event);
+    logger.info('Processing event for the bulk creation of products');
 
     const productItems = JSON.parse(event.body);
     const userId = getUserId(event);
