@@ -39,9 +39,9 @@ provider:
   environment:
     PRODUCTS_TABLE: Products-${self:provider.stage}
     IMAGES_S3_BUCKET: serverless-product-image-attachment-${self:provider.stage}
-    SIGNED_URL_EXPIRATION: 300
     PRODUCT_NAME_INDEX: ProductNameIndex
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    SIGNED_URL_EXPIRATION: 86400
     #ES_ENDPOINT: !GetAtt ProductsSearch.DomainEndpoint
 
 
@@ -154,7 +154,6 @@ functions:
         Action:
           - s3:PutObject
           - s3:GetObject
-          - s3:DeleteObject
         Resource: arn:aws:s3:::${self:provider.environment.IMAGES_S3_BUCKET}/*
       - Effect: Allow
         Action:

@@ -36,8 +36,8 @@ export async function deleteProductItem(tableKey: Key): Promise<void> {
     await productAccess.deleteProductItem(tableKey);
 }
 
-export function getUploadUrl(todoId: string): string {
-    return  productAccess.getUploadUrl(todoId);
+export function getUploadUrl(productId: string): string {
+    return  productAccess.getUploadUrl(productId);
 }
 
 export async function bulkAddProductItems(userId, productItems): Promise<void> {

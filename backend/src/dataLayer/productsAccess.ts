@@ -4,6 +4,7 @@ import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { PaginationInfo, Key } from '../types';
 import { ProductItem, ProductUpdate } from '../models';
 
+
 const XAWS = AWSXRay.captureAWS(AWS);
 const bucketName = process.env.IMAGES_S3_BUCKET;
 const urlExpiration = process.env.SIGNED_URL_EXPIRATION;
@@ -98,7 +99,7 @@ export class ProductAccess {
         return this.s3Client.getSignedUrl('putObject', {
             Bucket: bucketName,
             Key: productId,
-            Expires: urlExpiration
+            Expires: parseInt(urlExpiration)
         });
     }
 }

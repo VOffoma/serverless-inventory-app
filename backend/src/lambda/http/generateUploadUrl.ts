@@ -1,7 +1,5 @@
 import 'source-map-support/register';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import middy from '@middy/core';
-import cors from '@middy/http-cors';
 import { getUploadUrl, getSingleProductItem } from '../../businessLogic/products';
 import { createLogger } from '../../utils/logger';
 import { Key } from '../../types';
@@ -9,7 +7,7 @@ import { getUserId } from '../../utils/event';
 
 const logger = createLogger('generate-upload-url');
 
-export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const productId = event.pathParameters.productId;
   logger.info(`Processing event to create upload url for product with id: ${productId}`);
   
@@ -30,6 +28,10 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
 
     return {
       statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true
+      },
       body: JSON.stringify({
           uploadUrl: url
       })
@@ -45,9 +47,5 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
     }
   }
  
-});
+};
 
-handler
-.use(cors({
-    credentials: true
-}));
