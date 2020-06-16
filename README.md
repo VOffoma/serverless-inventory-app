@@ -9,10 +9,12 @@ This application has the following features: :
 * Auth0 Authentication and Custom authorizer that fetches certificate from Auth0 
 * Ability to sort Products by productName. (This required the usage of a localSecondary Index)
 * Pagination
+* Use of middy cors middleware
 
-Feature in progress: 
+Feature in progress: (They were not finished due to time constraints)
 
 * Implement a new endpoint that allows sending full-text search requests to Elasticsearch. (This has been commented out due to gnawing bug)
+* Use of secret manager
 
 # Product items
 
