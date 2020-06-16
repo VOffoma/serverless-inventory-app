@@ -21,7 +21,7 @@ export const handler = middy(async(event: APIGatewayProxyEvent): Promise<APIGate
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: `${productCount} has been created`
+                message: `${productCount} products has been created`
             })
           };
 
