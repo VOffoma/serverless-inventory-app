@@ -8,29 +8,28 @@ import { createLogger } from '../../utils/logger';
 const logger = createLogger('search-for-products');
 
 export const handler = middy(async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    logger.info('Processing event for searching through products');
-    const  queryString = event['queryStringParameters'];
-    logger.info(`ueryStringParameters: ${queryString}`);
 
-    // const q = event.queryStringParameters.q;
-    // logger.info('Query: ', );
-   console.log('Query ', queryString.q);
+    logger.info('Processing event for searching through products');
+    const queryString = event['queryStringParameters'];
+    logger.info(`queryStringParameters: ${queryString}`);
+
     try {
         const body = {
           "query": {
-            "match_all": {}
+            "match": {
+                "productName": queryString.q
+            }
           }
         };
 
         const searchResult = await searchProductDocuments(body);
-        logger.info(`Number of hits: ${searchResult}`);
-        // logger.info('Number of hits: ', searchResult.total);
-        // logger.info('hits: ', searchResult.hits);
+        
 
         return {
             statusCode: 200,
             body: JSON.stringify({
-                searchResult
+                totalhits: searchResult.total,
+                data: searchResult.hits
             })
           };
 

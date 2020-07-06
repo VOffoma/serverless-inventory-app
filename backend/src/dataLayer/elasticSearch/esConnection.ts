@@ -11,11 +11,10 @@ let awsCredentials;
 const AWSConnection = createAWSConnection(awsCredentials);
 
 const esHost = process.env.ES_ENDPOINT;
-console.log(esHost);
 
 const es = awsCredsifyAll(
     new Client({
-        node: esHost,
+        node: `https://${esHost}`,
         Connection: AWSConnection
     })
 );

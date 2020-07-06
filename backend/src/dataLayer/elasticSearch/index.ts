@@ -87,12 +87,7 @@ export class ElasticSearchAccess {
                 type: type,
                 body: body
             });
-            console.log('response: ', response);
-            const result = {
-                total: response,
-                hits: response
-            } 
-            return result;
+            return response.body.hits;
         } catch (error) {
            throw error; 
         }
