@@ -7,7 +7,7 @@ import { createProductItem } from '../../businessLogic/products';
 import { CreateProductRequest } from '../../types'
 import { getUserId } from '../../utils/event';
 
-const logger = createLogger('create-todo');
+const logger = createLogger('create-product');
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
 
