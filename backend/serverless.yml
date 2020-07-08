@@ -21,6 +21,9 @@ custom:
       - name: ProductRequest
         contentType: application/json
         schema: ${file(models/create-product-request.json)}
+      - name: OrderRequest
+        contentType: application/json
+        schema: ${file(models/create-order-request.json)}
 
 # Add the serverless-webpack plugin
 plugins:
@@ -38,6 +41,8 @@ provider:
     minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
   environment:
     PRODUCTS_TABLE: Products-${self:provider.stage}
+    ORDERS_TABLE: Orders-${self:provider.stage}
+    SHIPMENTS_TABLE: Shipments-${self:provider.stage}
     IMAGES_S3_BUCKET: serverless-product-image-attachment-${self:provider.stage}
     PRODUCT_NAME_INDEX: ProductNameIndex
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
@@ -179,6 +184,42 @@ functions:
           path: products/search
           cors: true
 
+  CreateOrder:
+    handler: src/lambda/http/createOrder.handler
+    events:
+      - http:
+          method: post
+          path: orders
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Create a new order
+            description: Create a new order
+            requestModels:
+              'application/json': OrderRequest
+    iamRoleStatements:
+      - Effect: Allow
+        Action: 
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.ORDERS_TABLE}
+
+  ProcessOrder:  
+    handler: src/lambda/dynamoDb/processOrder.handler
+    events:
+      - stream:
+          type: dynamodb
+          arn: !GetAtt OrdersDynamoDBTable.StreamArn
+    iamRoleStatements:
+      - Effect: Allow
+        Action: 
+          - dynamodb:UpdateItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.SHIPMENTS_TABLE}
+
 
 
 resources:
@@ -266,6 +307,42 @@ resources:
         StreamSpecification:
           StreamViewType: NEW_IMAGE
         TableName: ${self:provider.environment.PRODUCTS_TABLE}
+
+    OrdersDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties: 
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: orderId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: orderId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
+        TableName: ${self:provider.environment.ORDERS_TABLE}
+
+    ShipmentsDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties: 
+        AttributeDefinitions:
+          - AttributeName: shipmentId
+            AttributeType: S
+          - AttributeName: orderId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: shipmentId
+            KeyType: HASH
+          - AttributeName: orderId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
+        TableName: ${self:provider.environment.SHIPMENTS_TABLE}
 
     ProductsSearch:
       Type: AWS::Elasticsearch::Domain

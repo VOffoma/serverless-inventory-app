@@ -12,3 +12,17 @@ export interface ProductItem {
     mass_g: number
     quantity: number
   }
+
+  export enum ProcessingStatus{
+    Pending = "PENDING",
+    Incomplete = "INCOMPLETE",
+    Complete = "COMPLETE"
+  }
+
+  export interface Order {
+    orderId: string
+    requestedItems: object[]
+    addedAt: string
+    status: ProcessingStatus
+    userId: string
+  }

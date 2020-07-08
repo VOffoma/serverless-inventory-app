@@ -18,3 +18,7 @@ export interface CreateProductRequest {
    mass_g: number
    quantity: number
  }
+
+ export interface CreateOrderRequest {
+  requestedItems: object[]
+}
