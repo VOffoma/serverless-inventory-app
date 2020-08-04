@@ -21,11 +21,12 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
   // TODO: Update a Product item with the provided id using values in the "productUpdate" object
     try {
     
-        const userId = getUserId(event);
-        logger.info(`userId: ${userId}`);
+        // const userId = getUserId(event);
+        // logger.info(`userId: ${userId}`);
 
-        const tableKey: Key = {userId, productId};
+        const tableKey: Key = {productId};
         const productItemToUpdate = await getSingleProductItem(tableKey);
+        
 
         if(!productItemToUpdate) {
             throw new Error('this product does not exist');

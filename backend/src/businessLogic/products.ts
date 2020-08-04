@@ -1,25 +1,24 @@
 import * as uuid from 'uuid';
 import { ProductAccess } from '../dataLayer/productsAccess';
 import { ProductItem } from '../models';
-import { PaginationInfo, CreateProductRequest, Key, UpdateProductRequest } from '../types';
+import { PaginationInfo, CreateProductRequest, ProductKey, UpdateProductRequest } from '../types';
 
 const productAccess = new ProductAccess();
 const bucketName = process.env.IMAGES_S3_BUCKET;
 
-export async function getAllProductItems(userId: string, paginationInfo: PaginationInfo): Promise<any> {
-    return productAccess.getAllProductItems(userId, paginationInfo);
+export async function getAllProductItems(paginationInfo: PaginationInfo): Promise<any> {
+    return productAccess.getAllProductItems(paginationInfo);
 }
 
-export async function getSingleProductItem(tableKey: Key): Promise<ProductItem> {
+export async function getSingleProductItem(tableKey: ProductKey): Promise<ProductItem> {
     return productAccess.getSingleProductItem(tableKey);
 }
 
-export async function createProductItem(createProductRequest: CreateProductRequest, userId: string)
+export async function createProductItem(createProductRequest: CreateProductRequest)
 : Promise<ProductItem> {
     const itemId = uuid.v4();
     return await productAccess.createProductItem({
         productId: itemId,
-        userId: userId,
         quantity: createProductRequest.quantity || 0,
         addedAt: new Date().toISOString(),
         productName: createProductRequest.productName,
@@ -28,11 +27,11 @@ export async function createProductItem(createProductRequest: CreateProductReque
     });
 }
 
-export async function updateProductItem(updateProductRequest: UpdateProductRequest, tableKey: Key): Promise<void> {
+export async function updateProductItem(updateProductRequest: UpdateProductRequest, tableKey: ProductKey): Promise<void> {
     await productAccess.updateProductItem({...updateProductRequest}, tableKey);
 }
 
-export async function deleteProductItem(tableKey: Key): Promise<void> {
+export async function deleteProductItem(tableKey: ProductKey): Promise<void> {
     await productAccess.deleteProductItem(tableKey);
 }
 
@@ -40,8 +39,8 @@ export function getUploadUrl(productId: string): string {
     return  productAccess.getUploadUrl(productId);
 }
 
-export async function bulkAddProductItems(userId, productItems): Promise<void> {
-    const putItemRequests = createPutItemRequestsForProduct(userId, productItems);
+export async function bulkAddProductItems(productItems): Promise<void> {
+    const putItemRequests = createPutItemRequestsForProduct(productItems);
     
     let newItems = [];
     for (let i = 0; i < putItemRequests.length; i += 25) {
@@ -51,9 +50,9 @@ export async function bulkAddProductItems(userId, productItems): Promise<void> {
     };
 }
 
-function createPutItemRequestsForProduct(userId, productItems): [] {
+function createPutItemRequestsForProduct(productItems): [] {
     const requestItems = productItems.map((item: ProductItem) => {
-        const populatedItem = populateProductItemFields(userId, item);
+        const populatedItem = populateProductItemFields(item);
         return {
             'PutRequest': {
                 Item: populatedItem
@@ -63,9 +62,8 @@ function createPutItemRequestsForProduct(userId, productItems): [] {
     return requestItems;
 }
 
-function populateProductItemFields (userId: string, item: ProductItem) {
+function populateProductItemFields (item: ProductItem) {
     const itemId = uuid.v4();
-    item.userId = userId
     item.productId = itemId;
     item.quantity = item.quantity || 0;
     item.addedAt = new Date().toISOString();

@@ -44,7 +44,7 @@ provider:
     ORDERS_TABLE: Orders-${self:provider.stage}
     SHIPMENTS_TABLE: Shipments-${self:provider.stage}
     IMAGES_S3_BUCKET: serverless-product-image-attachment-${self:provider.stage}
-    PRODUCT_NAME_INDEX: ProductNameIndex
+    # PRODUCT_NAME_INDEX: ProductNameIndex
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     SIGNED_URL_EXPIRATION: 86400
     ES_ENDPOINT: !GetAtt ProductsSearch.DomainEndpoint
@@ -73,8 +73,9 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action: 
-          - dynamodb:Query
-        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}/index/${self:provider.environment.PRODUCT_NAME_INDEX}
+          - dynamodb:Scan
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PRODUCTS_TABLE}
+        #/index/${self:provider.environment.PRODUCT_NAME_INDEX}
 
   CreateProduct:
     handler: src/lambda/http/createProduct.handler
@@ -283,26 +284,26 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties: 
         AttributeDefinitions:
-          - AttributeName: userId
-            AttributeType: S
           - AttributeName: productId
             AttributeType: S
-          - AttributeName: productName
-            AttributeType: S
+          # - AttributeName: addedAt
+          #   AttributeType: S
+          # - AttributeName: productName
+          #   AttributeType: S
         KeySchema:
-          - AttributeName: userId
-            KeyType: HASH
           - AttributeName: productId
-            KeyType: RANGE
-        LocalSecondaryIndexes:
-          - IndexName: ${self:provider.environment.PRODUCT_NAME_INDEX}
-            KeySchema:
-              - AttributeName: userId
-                KeyType: HASH
-              - AttributeName: productName
-                KeyType: RANGE
-            Projection:
-              ProjectionType: ALL # What attributes will be copied to an index
+            KeyType: HASH
+          # - AttributeName: addedAt
+          #   KeyType: RANGE
+        # LocalSecondaryIndexes:
+        #   - IndexName: ${self:provider.environment.PRODUCT_NAME_INDEX}
+        #     KeySchema:
+        #       - AttributeName: productId
+        #         KeyType: HASH
+        #       - AttributeName: productName
+        #         KeyType: RANGE
+        #     Projection:
+        #       ProjectionType: ALL # What attributes will be copied to an index
         BillingMode: PAY_PER_REQUEST
         StreamSpecification:
           StreamViewType: NEW_IMAGE

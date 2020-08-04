@@ -28,7 +28,7 @@ export const handler = middy(async(event: APIGatewayProxyEvent): Promise<APIGate
 
         const paginationInfo: PaginationInfo = {limit, nextKey};
 
-        const queryResult = await getAllProductItems(userId, paginationInfo);
+        const queryResult = await getAllProductItems(paginationInfo);
         logger.info(`Available products: ${queryResult.Items}`);
 
         return {

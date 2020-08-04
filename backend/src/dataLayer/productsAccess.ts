@@ -1,14 +1,14 @@
 import * as AWS from 'aws-sdk';
 import * as AWSXRay from 'aws-xray-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
-import { PaginationInfo, Key } from '../types';
+import { PaginationInfo, ProductKey } from '../types';
 import { ProductItem, ProductUpdate } from '../models';
 
 
 const XAWS = AWSXRay.captureAWS(AWS);
 const bucketName = process.env.IMAGES_S3_BUCKET;
 const urlExpiration = process.env.SIGNED_URL_EXPIRATION;
-const productNameIndex = process.env.PRODUCT_NAME_INDEX;
+// const productNameIndex = process.env.PRODUCT_NAME_INDEX;
 
 export class ProductAccess {
     constructor(
@@ -17,15 +17,11 @@ export class ProductAccess {
         private readonly productsTable =  process.env.PRODUCTS_TABLE
     ){}
 
-    async getAllProductItems(userId: string, paginationInfo: PaginationInfo): Promise<any> {
+    async getAllProductItems(paginationInfo: PaginationInfo): Promise<any> {
 
-        const result = await this.docClient.query({
+        const result = await this.docClient.scan({
             TableName: this.productsTable,
-            IndexName: productNameIndex,
-            KeyConditionExpression: 'userId = :userId',
-            ExpressionAttributeValues: {
-                ':userId':userId
-            },
+            // IndexName: productNameIndex,
             Limit: paginationInfo.limit,
             ExclusiveStartKey: paginationInfo.nextKey
         }).promise();
@@ -34,12 +30,13 @@ export class ProductAccess {
         return result;
     }
 
-    async getSingleProductItem(tableKey: Key): Promise<ProductItem>{
+
+    async getSingleProductItem(tableKey: ProductKey): Promise<ProductItem>{
         const result = await this.docClient.get({
           TableName: this.productsTable,
           Key: {
-            userId: tableKey.userId,
-            productId: tableKey.productId
+            productId: tableKey.productId,
+            // addedAt: tableKey.addedAt
           }
         })
         .promise();
@@ -55,12 +52,12 @@ export class ProductAccess {
         return productItem;
     }
 
-    async updateProductItem(productUpdate: ProductUpdate, tableKey: Key): Promise<void> {
+    async updateProductItem(productUpdate: ProductUpdate, tableKey: ProductKey): Promise<void> {
         await this.docClient.update({
             TableName: this.productsTable,
             Key: {
-                userId: tableKey.userId,
-                productId: tableKey.productId
+                productId: tableKey.productId,
+                // addedAt: tableKey.addedAt
             },
             UpdateExpression: "set quantity=:q, mass_g=:mg",
             ExpressionAttributeValues: {
@@ -71,12 +68,12 @@ export class ProductAccess {
 
     }
 
-    async deleteProductItem(tableKey: Key): Promise<void> {
+    async deleteProductItem(tableKey: ProductKey): Promise<void> {
         await this.docClient.delete({
             TableName: this.productsTable,
             Key: {
-                userId: tableKey.userId,
-                productId: tableKey.productId
+                productId: tableKey.productId,
+                // addedAt: tableKey.addedAt
             },
         }).promise();
 

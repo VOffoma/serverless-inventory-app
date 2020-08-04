@@ -5,7 +5,7 @@ import cors from '@middy/http-cors';
 import { createLogger } from '../../utils/logger';
 import { deleteProductItem, getSingleProductItem } from '../../businessLogic/products';
 import { getUserId } from '../../utils/event';
-import { Key } from '../../types';
+import { ProductKey } from '../../types';
 
 
 const logger = createLogger('delete-product');
@@ -17,15 +17,16 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
   // TODO: Remove a Product item by id
 
   try {
-    const userId = getUserId(event);
-    const tableKey: Key = {userId, productId};
+    // const userId = getUserId(event);
+    const tableKey: ProductKey = {productId};
     const productItemToDelete = await getSingleProductItem(tableKey);
 
     if(!productItemToDelete) {
         throw new Error('this product does not exist');
     }
     
-    await deleteProductItem(tableKey);
+   await deleteProductItem(tableKey);
+   
 
     logger.info(`product has been deleted.`);
 

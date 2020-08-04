@@ -3,9 +3,9 @@ export interface PaginationInfo {
    nextKey: object
 }
 
-export interface Key {
-   userId: string
+export interface ProductKey {
    productId: string
+  //  addedAt: string
  }
 
 export interface CreateProductRequest {
