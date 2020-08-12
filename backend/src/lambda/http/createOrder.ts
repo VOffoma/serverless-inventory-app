@@ -4,7 +4,6 @@ import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import { createLogger } from '../../utils/logger';
 import { createOrder } from '../../businessLogic/orders';
-import { getUserId } from '../../utils/event';
 
 const logger = createLogger('create-order');
 
@@ -14,8 +13,7 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
 
   logger.info(`Processing event to create new order with the following items: ${orderItems}`);
  
-  const userId = getUserId(event);
-  const newOrder = await createOrder(orderItems, userId);
+  const newOrder = await createOrder(orderItems);
 
   logger.info(`details for new order: ${newOrder}`);
 

@@ -4,8 +4,8 @@ import middy from '@middy/core';
 import cors from '@middy/http-cors';
 import { createLogger } from '../../utils/logger';
 import { updateProductItem, getSingleProductItem } from '../../businessLogic/products';
-import { Key, UpdateProductRequest} from '../../types';
-import { getUserId } from '../../utils/event';
+import { ProductKey, UpdateProductRequest} from '../../types';
+
 
 
 const logger = createLogger('update-product');
@@ -24,7 +24,7 @@ export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGat
         // const userId = getUserId(event);
         // logger.info(`userId: ${userId}`);
 
-        const tableKey: Key = {productId};
+        const tableKey: ProductKey = {productId};
         const productItemToUpdate = await getSingleProductItem(tableKey);
         
 
