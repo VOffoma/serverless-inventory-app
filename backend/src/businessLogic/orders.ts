@@ -1,19 +1,17 @@
 import * as uuid from 'uuid';
-import { OrderAccess } from '../dataLayer/ordersAccess';
-import { Order, ProcessingStatus } from '../models';
+import { DBAccess } from '../dataLayer/dbAccess';
+import { Order } from '../models';
 
-const orderAccess = new OrderAccess();
+const dbAccess = new DBAccess(process.env.ORDERS_TABLE);
 
 
-export async function createOrder(orderItems: object[], userId: string)
-: Promise<Order> {
+export async function createOrder(orderItems: object[]): Promise<Order> {
 
-    return await orderAccess.createOrder({
+    return await dbAccess.createRecord({
         orderId: uuid.v4(),
         requestedItems: orderItems,
-        addedAt: new Date().toISOString(),
-        userId: userId,
-        status: ProcessingStatus.Pending
+        addedAt: new Date().toISOString()
+        //status: ProcessingStatus.Pending
     });
 }
 

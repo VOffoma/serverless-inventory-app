@@ -12,16 +12,29 @@ export interface ProductItem {
     quantity: number
   }
 
-  export enum ProcessingStatus{
+  export enum ShipmentStatus{
     Pending = "PENDING",
-    Incomplete = "INCOMPLETE",
-    Complete = "COMPLETE"
+    Sent = "SENT"
   }
 
   export interface Order {
     orderId: string
     requestedItems: object[]
     addedAt: string
-    status: ProcessingStatus
-    userId: string
+    // status: ProcessingStatus
+  }
+
+  export interface Shipment {
+    shipmentId: string
+    orderId: string
+    shipped: object[]
+    status: ShipmentStatus
+  }
+
+  export interface UnfulfilledOrder {
+    orderId: string
+    productId: string
+    quantity: number
+    addedAt: string
+    // status: ProcessingStatus
   }
