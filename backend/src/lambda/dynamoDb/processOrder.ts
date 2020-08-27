@@ -1,5 +1,7 @@
 import {DynamoDBStreamEvent, DynamoDBStreamHandler} from 'aws-lambda';
 import 'source-map-support/register';
+import { processOrderItem } from '../../businessLogic/orders';
+
 
 
 export const handler: DynamoDBStreamHandler = async (event: DynamoDBStreamEvent) => {
@@ -10,8 +12,13 @@ export const handler: DynamoDBStreamHandler = async (event: DynamoDBStreamEvent)
 
         if (record.eventName === 'INSERT') {
           const newOrder = record.dynamodb.NewImage;
-          for(let orderItem in newOrder){
-            console.log(orderItem);
+          const orderItems = newOrder.requestedItems.L;
+          const orderId = newOrder.orderId.S;
+
+          for(let orderItem of orderItems){
+            const productId = orderItem.M.productId.S;
+            const orderItemQuantity = parseInt(orderItem.M.quantity.N, 10);
+            await processOrderItem({orderId, productId, orderItemQuantity})
           }
         }
         else{
@@ -19,4 +26,7 @@ export const handler: DynamoDBStreamHandler = async (event: DynamoDBStreamEvent)
         }   
     }
 }
+
+
+
 
