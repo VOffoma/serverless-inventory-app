@@ -1,6 +1,6 @@
 import * as AWS from 'aws-sdk';
 import * as AWSXRay from 'aws-xray-sdk';
-import { DocumentClient, ItemList } from 'aws-sdk/clients/dynamodb';
+import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { PaginationInfo } from '../types';
 
 const XAWS = AWSXRay.captureAWS(AWS);
@@ -13,7 +13,7 @@ export class DBAccess {
         this.dbTable = dbtable;
     }
 
-    async getAllRecords(paginationInfo: PaginationInfo): Promise<ItemList> {
+    async getAllRecords(paginationInfo: PaginationInfo): Promise<any> {
 
         const queryResult = await this.docClient.scan({
             TableName: this.dbTable,
@@ -23,7 +23,7 @@ export class DBAccess {
         }).promise();
 
     
-        return queryResult.Items;
+        return queryResult
     }
 
 
@@ -33,7 +33,7 @@ export class DBAccess {
           Key: tableKey
         })
         .promise();
-        return result.Item;
+        return result;
     } 
 
     async createRecord(record): Promise<any> {
@@ -45,7 +45,7 @@ export class DBAccess {
         return record;
     }
 
-    async updateProductItem(updateExpression, attributeValues, tableKey): Promise<void> {
+    async updateRecord(updateExpression, attributeValues, tableKey): Promise<void> {
         await this.docClient.update({
             TableName: this.dbTable,
             Key: tableKey,
@@ -55,7 +55,7 @@ export class DBAccess {
 
     }
 
-    async deleteProductItem(tableKey): Promise<void> {
+    async deleteRecord(tableKey): Promise<void> {
         await this.docClient.delete({
             TableName: this.dbTable,
             Key: tableKey
@@ -63,7 +63,7 @@ export class DBAccess {
 
     }
 
-    async bulkAddProductItems(bulkRecords): Promise<void>{
+    async bulkAddRecords(bulkRecords): Promise<void>{
         try {
             await this.docClient.batchWrite({
                 RequestItems: {

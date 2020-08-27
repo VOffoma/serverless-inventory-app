@@ -2,22 +2,26 @@ import * as uuid from 'uuid';
 import { ProductAccess } from '../dataLayer/productsAccess';
 import { ProductItem } from '../models';
 import { PaginationInfo, CreateProductRequest, ProductKey, UpdateProductRequest } from '../types';
+import { DBAccess } from '../dataLayer/dbAccess';
+import { MediaBucketAccess } from '../dataLayer/mediaBucketAccess';
 
-const productAccess = new ProductAccess();
+const mediaBucketAccess = new MediaBucketAccess();
+const dbAccess = new DBAccess(process.env.PRODUCTS_TABLE);
 const bucketName = process.env.IMAGES_S3_BUCKET;
+// const productAccess = new ProductAccess();
 
 export async function getAllProductItems(paginationInfo: PaginationInfo): Promise<any> {
-    return productAccess.getAllProductItems(paginationInfo);
+    return await dbAccess.getAllRecords(paginationInfo);
 }
 
-export async function getSingleProductItem(tableKey: ProductKey): Promise<ProductItem> {
-    return productAccess.getSingleProductItem(tableKey);
+export async function getSingleProductItem(tableKey: ProductKey): Promise<any> {
+    return await dbAccess.getSingleRecord(tableKey);
 }
 
 export async function createProductItem(createProductRequest: CreateProductRequest)
 : Promise<ProductItem> {
     const itemId = uuid.v4();
-    return await productAccess.createProductItem({
+    return await dbAccess.createRecord({
         productId: itemId,
         quantity: createProductRequest.quantity || 0,
         addedAt: new Date().toISOString(),
@@ -28,15 +32,20 @@ export async function createProductItem(createProductRequest: CreateProductReque
 }
 
 export async function updateProductItem(updateProductRequest: UpdateProductRequest, tableKey: ProductKey): Promise<void> {
-    await productAccess.updateProductItem({...updateProductRequest}, tableKey);
+    const updateExpression = "set quantity=:q, mass_g=:mg";
+    const attributeValues =  {
+        ":q": updateProductRequest.quantity,
+        ":mg": updateProductRequest.mass_g
+    }
+    await dbAccess.updateRecord(updateExpression, attributeValues, tableKey);
 }
 
 export async function deleteProductItem(tableKey: ProductKey): Promise<void> {
-    await productAccess.deleteProductItem(tableKey);
+    await dbAccess.deleteRecord(tableKey);
 }
 
 export function getUploadUrl(productId: string): string {
-    return  productAccess.getUploadUrl(productId);
+    return mediaBucketAccess.getUploadUrl(productId);
 }
 
 export async function bulkAddProductItems(productItems): Promise<void> {
@@ -46,7 +55,7 @@ export async function bulkAddProductItems(productItems): Promise<void> {
     for (let i = 0; i < putItemRequests.length; i += 25) {
         const upperLimit = Math.min(i + 25, putItemRequests.length);
         newItems = putItemRequests.slice(i, upperLimit);
-        await productAccess.bulkAddProductItems(newItems);
+        await dbAccess.bulkAddRecords(newItems);
     };
 }
 
